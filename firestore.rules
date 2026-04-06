@@ -1,0 +1,79 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: projects
+    // Fields: name (string), userId (string), createdAt (number), updatedAt (number)
+    //
+    // Collection: files
+    // Fields: projectId (string), path (string), content (string), type (string), updatedAt (number)
+    //
+    // Collection: messages
+    // Fields: projectId (string), role (string), content (string), createdAt (number)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isProjectOwner(projectId) {
+      return isAuthenticated() && get(/databases/$(database)/documents/projects/$(projectId)).data.userId == request.auth.uid;
+    }
+
+    function isValidProject(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.userId == request.auth.uid &&
+             data.createdAt is number &&
+             data.updatedAt is number;
+    }
+
+    function isValidFile(data) {
+      return data.projectId is string &&
+             data.path is string && data.path.size() > 0 && data.path.size() < 500 &&
+             data.content is string && data.content.size() < 1000000 &&
+             data.type in ['file', 'directory'] &&
+             data.updatedAt is number;
+    }
+
+    function isValidMessage(data) {
+      return data.projectId is string &&
+             data.role in ['user', 'assistant'] &&
+             data.content is string && data.content.size() < 50000 &&
+             data.createdAt is number;
+    }
+
+    // Projects
+    match /projects/{projectId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isAuthenticated() && isValidProject(request.resource.data);
+      allow update: if isOwner(resource.data.userId) && isValidProject(request.resource.data);
+      allow delete: if isOwner(resource.data.userId);
+    }
+
+    // Files
+    match /files/{fileId} {
+      allow read: if isProjectOwner(resource.data.projectId);
+      allow create: if isAuthenticated() && isProjectOwner(request.resource.data.projectId) && isValidFile(request.resource.data);
+      allow update: if isProjectOwner(resource.data.projectId) && isValidFile(request.resource.data);
+      allow delete: if isProjectOwner(resource.data.projectId);
+    }
+
+    // Messages
+    match /messages/{messageId} {
+      allow read: if isProjectOwner(resource.data.projectId);
+      allow create: if isAuthenticated() && isProjectOwner(request.resource.data.projectId) && isValidMessage(request.resource.data);
+      allow update: if false; // Messages are immutable
+      allow delete: if isProjectOwner(resource.data.projectId);
+    }
+  }
+}
