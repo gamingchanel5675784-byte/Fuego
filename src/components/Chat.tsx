@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Loader2, User, Bot, Paperclip, Image as ImageIcon, X, Sparkles } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
+import Markdown from 'react-markdown';
 import { ChatMessage } from '../types';
 import { cn } from '../lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface ChatProps {
   messages: ChatMessage[];
@@ -89,7 +89,7 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage, isLoading }
                   : "bg-slate-800/80 backdrop-blur-sm text-slate-200 rounded-tl-none border border-slate-700"
               )}>
                 <div className="prose prose-invert prose-sm max-w-none">
-                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  <Markdown>{msg.content}</Markdown>
                 </div>
               </div>
             </motion.div>

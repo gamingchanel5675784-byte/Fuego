@@ -11,9 +11,7 @@ import { GitPanel } from './components/GitPanel';
 import { Project, FileNode, ChatMessage, AIAction } from './types';
 import { generateCode } from './lib/gemini';
 import { Loader2, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Sparkles } from 'lucide-react';
-import * as Resizable from 'react-resizable-panels';
-
-const { Panel, PanelGroup, PanelResizeHandle } = Resizable;
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import confetti from 'canvas-confetti';
 
 enum OperationType {

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Play, Maximize2, RefreshCw, ExternalLink, Monitor, Smartphone, Tablet, Code } from 'lucide-react';
+import { Sparkles, Play, Maximize2, RefreshCw, ExternalLink, Monitor, Smartphone, Tablet, Code } from 'lucide-react';
 import { FileNode } from '../types';
 import { cn } from '../lib/utils';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 
 interface PreviewProps {
   files: FileNode[];
@@ -138,5 +138,3 @@ export const Preview: React.FC<PreviewProps> = ({ files }) => {
     </div>
   );
 };
-
-import { Sparkles } from 'lucide-react';
